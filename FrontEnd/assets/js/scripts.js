@@ -4,6 +4,11 @@ console.log(gallery);
 const categories = document.querySelector(".categories");
 console.log(categories);
 
+const log = document.querySelector("#log");
+log.addEventListener("click", () => {
+  window.location.href = "login.html";
+});
+
 // Récupération des projets sur l'api
 async function fetchProjectsData() {
   await fetch("http://localhost:5678/api/works")
@@ -44,7 +49,7 @@ categories.innerHTML = `
 <input class="inputCategories" id="3" type="button" name="Hotels & Restaurants" value="Hotels & Restaurants">
 </div>
 `;
-
+// -----------------------------------------------------
 // // Filtrer les projets en cliquant sur les catégories
 // tentative ultra foireuse
 
@@ -73,6 +78,7 @@ categories.innerHTML = `
 // }
 
 // filterCategories();
+// --------------------------------------------------------------
 
 // Filtrer les projets en cliquant sur les catégories
 function filterCategories() {
@@ -86,8 +92,8 @@ function filterCategories() {
         category.classList.remove("inputSelected");
       });
       e.target.classList.add("inputSelected");
-      // -------------------------------------
 
+      // Affichage de la catégorie selectionnée
       if (e.target.value === "Tous") {
         gallery.innerHTML = "";
         projectsDisplay();
