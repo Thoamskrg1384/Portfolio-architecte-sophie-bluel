@@ -327,25 +327,25 @@ footer nav ul {
 }
 
 /* Login */
-#loginForm {
+.loginForm--login {
   width: 30%;
   margin: 150px auto;
 }
-#loginForm > * {
+.loginForm--login > * {
   text-align: center;
 }
-#loginForm h2 {
+.loginForm--login h2 {
   margin-bottom: 20px;
   text-align: center;
 }
-#loginForm form {
+.loginForm--login form {
   text-align: left;
   margin-top: 30px;
   display: flex;
   flex-direction: column;
 }
 
-#loginForm input {
+.loginForm--login input {
   height: 50px;
   font-size: 1.2em;
   box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
@@ -355,11 +355,11 @@ footer nav ul {
   border: none;
 }
 
-#loginForm label {
+.loginForm--login label {
   margin: 2em 0 1em 0;
 }
 
-#loginForm a {
+.loginForm--login a {
   color: black;
   text-align: center;
   cursor: pointer;

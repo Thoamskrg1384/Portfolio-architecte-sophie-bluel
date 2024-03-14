@@ -7,7 +7,7 @@ let email = document.getElementById("email");
 let password = document.getElementById("password");
 const inputLogin = document.querySelector("#loginForm input");
 const span = document.querySelector("#loginForm span");
-const connexion = document.querySelector("#connexion");
+const formLogin = document.querySelector("#loginForm");
 
 //  Afficher un message d'erreur si la saisie est mauvaise
 const errorDisplay = (message, valid) => {
@@ -26,58 +26,75 @@ const errorDisplay = (message, valid) => {
   }
 };
 
-// Verifier que le format de l'adresse mail est correct
-const emailChecker = () => {
-  email.addEventListener("input", (e) => {
-    const value = e.target.value;
-    if (!value.match(/^[\w_.-]+@[\w-]+\.[a-z]{2,4}$/i)) {
-      console.log("erreur mail");
-      errorDisplay("Erreur dans l’identifiant ou le mot de passe", false);
-    } else {
-      errorDisplay("", true);
-    }
-  });
+/**
+ * Verifier que le format de l'adresse mail est correct
+ */
+const emailChecker = (value) => {
+  if (!value.match(/^[\w_.-]+@[\w-]+\.[a-z]{2,4}$/i)) {
+    errorDisplay("Erreur dans l’identifiant ou le mot de passe", false);
+    return false;
+  } else {
+    errorDisplay("", true);
+    return true;
+  }
 };
+email.addEventListener("input", (e) => {
+  const value = e.target.value;
+  emailChecker(value);
+});
 
 // Verifier que le mdp est identique au token
-const passwordChecker = () => {
-  password.addEventListener("input", (e) => {
-    const value = e.target.value;
-    if (
-      !value.match(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1MTg3NDkzOSwiZXhwIjoxNjUxOTYxMzM5fQ.JGN1p8YIfR-M-5eQ-Ypy6Ima5cKA4VbfL2xMr2MgHm4"
-      )
-    ) {
-      console.log("erreur password");
-      errorDisplay("Erreur dans l’identifiant ou le mot de passe", false);
-    } else {
-      errorDisplay("", true);
-      localStorage.setItem("password", value);
-    }
-  });
+const passwordChecker = (value) => {
+  if (
+    !value.match(
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1MTg3NDkzOSwiZXhwIjoxNjUxOTYxMzM5fQ.JGN1p8YIfR-M-5eQ-Ypy6Ima5cKA4VbfL2xMr2MgHm4"
+    )
+  ) {
+    errorDisplay("Erreur dans l’identifiant ou le mot de passe", false);
+    return false;
+  } else {
+    errorDisplay("", true);
+    return true;
+  }
 };
+password.addEventListener("input", (e) => {
+  const value = e.target.value;
+  passwordChecker(value);
+});
 
 // Rediriger vers la paged'acceuil, au click sur le bouton "se connecter", si le token est bon
 
-const connexionSubmit = () => {
-  connexion.addEventListener("click", (e) => {
-    e.preventDefault();
-    const emailValue = email.value.trim();
-    const passwordValue = password.value.trim();
+const connexionSubmit = (emailValue, passwordValue) => {
+  if (emailChecker(emailValue) && passwordChecker(passwordValue)) {
+    fetch("http://localhost:5678/api/users/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: emailValue,
+        password: passwordValue,
+      }),
+    })
+      .then((response) => {
+        // Il y a eu un problème, on stop les then avec une erreur qui va dans le catch
+        if (response.status !== 200) {
+          throw new Error("Une erreur est survenue");
+        }
 
-    if (
-      emailValue.match(/^[\w_.-]+@[\w-]+\.[a-z]{2,4}$/i) &&
-      passwordValue.match(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1MTg3NDkzOSwiZXhwIjoxNjUxOTYxMzM5fQ.JGN1p8YIfR-M-5eQ-Ypy6Ima5cKA4VbfL2xMr2MgHm4"
-      )
-    ) {
-      window.location.href = "logged.html";
-    } else {
-      window.location.href = "login.html";
-    }
-  });
+        return response.json();
+      })
+      .then((data) => {
+        localStorage.setItem("token", data.token);
+        window.location.href = "index.html";
+      })
+      .catch((err) => {
+        errorDisplay("Une erreur est survenue", false);
+      });
+  }
 };
+formLogin.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-emailChecker();
-passwordChecker();
-connexionSubmit();
+  const emailValue = email.value.trim();
+  const passwordValue = password.value.trim();
+
+  connexionSubmit(emailValue, passwordValue);
+});
