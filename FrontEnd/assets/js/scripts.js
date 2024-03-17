@@ -11,7 +11,13 @@ log.addEventListener("click", () => {
 
 // Récupération des projets sur l'api
 async function fetchProjectsData() {
-  await fetch("http://localhost:5678/api/works")
+  await fetch("http://localhost:5678/api/works", {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "content-type": "application/json",
+    },
+  })
     .then((res) => res.json())
     .then((data) => (projects = data));
   console.log(projects);

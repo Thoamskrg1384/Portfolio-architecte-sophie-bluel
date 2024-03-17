@@ -31,7 +31,7 @@ const errorDisplay = (message, valid) => {
  */
 const emailChecker = (value) => {
   if (!value.match(/^[\w_.-]+@[\w-]+\.[a-z]{2,4}$/i)) {
-    errorDisplay("Erreur dans l’identifiant ou le mot de passe", false);
+    errorDisplay("Erreur dans l’identifiant", false);
     return false;
   } else {
     errorDisplay("", true);
@@ -41,16 +41,13 @@ const emailChecker = (value) => {
 email.addEventListener("input", (e) => {
   const value = e.target.value;
   emailChecker(value);
+  console.log(e.target.value);
 });
 
-// Verifier que le mdp est identique au token
+// Verifier que le mdp est valide
 const passwordChecker = (value) => {
-  if (
-    !value.match(
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1MTg3NDkzOSwiZXhwIjoxNjUxOTYxMzM5fQ.JGN1p8YIfR-M-5eQ-Ypy6Ima5cKA4VbfL2xMr2MgHm4"
-    )
-  ) {
-    errorDisplay("Erreur dans l’identifiant ou le mot de passe", false);
+  if (!value.match("S0phie")) {
+    errorDisplay("Erreur dans le mot de passe", false);
     return false;
   } else {
     errorDisplay("", true);
@@ -60,25 +57,33 @@ const passwordChecker = (value) => {
 password.addEventListener("input", (e) => {
   const value = e.target.value;
   passwordChecker(value);
+  console.log(e.target.value);
 });
 
-// Rediriger vers la paged'acceuil, au click sur le bouton "se connecter", si le token est bon
+// Rediriger vers la page d'acceuil, au click sur le bouton "se connecter", si le token est bon
 
 const connexionSubmit = (emailValue, passwordValue) => {
+  const dataToSend = {
+    email: "sophie.bluel@test.tld",
+    password: "S0phie",
+  };
   if (emailChecker(emailValue) && passwordChecker(passwordValue)) {
     fetch("http://localhost:5678/api/users/login", {
       method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         email: emailValue,
         password: passwordValue,
       }),
     })
       .then((response) => {
-        // Il y a eu un problème, on stop les then avec une erreur qui va dans le catch
+        // Il y a eun problème, on stop les then avec une erreur qui va dans le catch
         if (response.status !== 200) {
           throw new Error("Une erreur est survenue");
         }
-
         return response.json();
       })
       .then((data) => {
@@ -90,11 +95,11 @@ const connexionSubmit = (emailValue, passwordValue) => {
       });
   }
 };
+
 formLogin.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const emailValue = email.value.trim();
   const passwordValue = password.value.trim();
-
   connexionSubmit(emailValue, passwordValue);
 });
