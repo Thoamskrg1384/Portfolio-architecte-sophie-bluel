@@ -41,7 +41,7 @@ const emailChecker = (value) => {
 email.addEventListener("input", (e) => {
   const value = e.target.value;
   emailChecker(value);
-  console.log(e.target.value);
+  // console.log(e.target.value);
 });
 
 // Verifier que le mdp est valide
@@ -57,7 +57,7 @@ const passwordChecker = (value) => {
 password.addEventListener("input", (e) => {
   const value = e.target.value;
   passwordChecker(value);
-  console.log(e.target.value);
+  // console.log(e.target.value);
 });
 
 // Rediriger vers la page d'acceuil, au click sur le bouton "se connecter", si le token est bon

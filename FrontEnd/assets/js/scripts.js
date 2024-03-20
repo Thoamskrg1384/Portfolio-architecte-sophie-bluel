@@ -1,12 +1,23 @@
 let projects = [];
 const gallery = document.querySelector(".gallery");
-console.log(gallery);
+// console.log(gallery);
 const categories = document.querySelector(".categories");
-console.log(categories);
+// console.log(categories);
 
-const log = document.querySelector("#log");
+const log = document.getElementById("log");
 log.addEventListener("click", () => {
   window.location.href = "login.html";
+});
+const contacts = document.querySelector("#contacts");
+const projets = document.querySelector("#projets");
+
+// Actions au clic sur les liens dans la nav
+contacts.addEventListener("click", () => {
+  window.location.href = "#contact";
+});
+projets.addEventListener("click", () => {
+  window.location.href = "#portfolio";
+  console.log("projets");
 });
 
 // Récupération des projets sur l'api
@@ -20,7 +31,7 @@ async function fetchProjectsData() {
   })
     .then((res) => res.json())
     .then((data) => (projects = data));
-  console.log(projects);
+  // console.log(projects);
   projectsDisplay();
 }
 fetchProjectsData();
@@ -29,7 +40,7 @@ fetchProjectsData();
 function projectsDisplay() {
   // pour chaque projet, on crée les éléments suivants
   projects.forEach((project) => {
-    console.log(project);
+    // console.log(project);
     const figure = document.createElement("figure");
     const picture = document.createElement("img");
     const figcaption = document.createElement("figcaption");
@@ -91,7 +102,7 @@ function filterCategories() {
   const inputCategories = document.querySelectorAll(".inputCategories");
   inputCategories.forEach((inputCategory) => {
     inputCategory.addEventListener("click", (e) => {
-      console.log(e.target.id);
+      // console.log(e.target.id);
 
       // changer la couleur du bouton du filtre séléctionné
       inputCategories.forEach((category) => {
