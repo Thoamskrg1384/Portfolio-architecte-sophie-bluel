@@ -17,7 +17,7 @@ contacts.addEventListener("click", () => {
 });
 projets.addEventListener("click", () => {
   window.location.href = "#portfolio";
-  console.log("projets");
+  // console.log("projets");
 });
 
 // Récupération des projets sur l'api

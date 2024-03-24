@@ -35,10 +35,8 @@ if (userConnected) {
   // Ouverture de la modale au click sur le bouton "Modifier"
   openBtnModale.addEventListener("click", () => {
     console.log("test ouverture modals");
-    modale.style.display = "block";
+    modale.style.display = "flex";
   });
-
-  // Ouvrir la deuxième modale au click sur le bouton "Ajouter une photo"
 
   // Logique des modales
 
@@ -52,8 +50,5 @@ if (userConnected) {
     }
   });
 }
-// const userDisconnected = localStorage.removeItem("token");
-// if (userDisconnected) {
-//   console.log("user disconnected");
-// }
+
 //TODO : 1, 2, 3 et créer la modal des projets + si possible la remplir avec les projets
