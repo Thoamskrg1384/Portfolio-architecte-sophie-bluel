@@ -52,7 +52,7 @@ const firstModale = function () {
 };
 // ---------------------------------------------------------------------------------------------------------------------------
 
-// Composition modale de base
+// Composition seconde modale
 const secondModale = function () {
   modale2.innerHTML = `
     <div id="modaleContent" class="modale-content">
@@ -60,11 +60,15 @@ const secondModale = function () {
       <span id="spanBack"><i class="fa-solid fa-arrow-left arrow"></i></span>
       <h3>Ajout photo</h3>
       <div class="addPicContainer">
-          <img src="#" class="imageDisplay" id="imageDisplay" alt="image choisie" style="display: none;">
-          <span id="iconPic" class="iconPic"><i class="fa-regular fa-image"></i></span>
-          <input type="file" name="addPicInput" class="addPicInput" id="addPicInput">
-          <label id="addPicLabel" class="addPicLabel" for="addPicInput">+ Ajouter photo</label>
-          <p id="addPicTxt">jpg, png : 4mo max</p>
+          <div id="previewNewPic">
+              <img src="#" class="imageDisplay" id="imageDisplay" alt="image choisie" style="display: none;">
+          </div>
+          <div id="addPicContent">
+              <span id="iconPic" class="iconPic"><i class="fa-regular fa-image"></i></span>
+              <input type="file" name="addPicInput" class="addPicInput" id="addPicInput">
+              <label id="addPicLabel" class="addPicLabel" for="addPicInput">+ Ajouter photo</label>
+              <p id="addPicTxt">jpg, png : 4mo max</p>
+          </div>
       </div>
       <div class="inputContainer">
           <label for="inputTitle">Titre</label>
@@ -84,7 +88,7 @@ const secondModale = function () {
   // Récupérer l'élément <span> qui ferme la modale
   const spanClose = document.querySelector("#spanClose");
 
-  // Récupérer l'élément <button> qui permet d'ajouter une photo
+  // Récupérer l'élément <button> qui permet de soumettre le formulaire de création d'une nouvelle photo
   const btnPost = document.querySelector("#btnPost");
 
   // Récupérer l'élement <span> spanBack, qui permet d'afficher la modale précedente.
@@ -97,7 +101,7 @@ const secondModale = function () {
   const imageDisplay = document.querySelector("#imageDisplay");
 
   // Des qu'on selectionne une image, l'afficher et masquer le reste du container
-  addPicInput.addEventListener("change", (e) => {
+  addPicInput.addEventListener("input", (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
     reader.addEventListener("load", (e) => {
@@ -234,3 +238,70 @@ const deleteWork = function (projectId) {
     }
   });
 };
+
+// Fonction pour ajouter un nouveau projet
+
+// Fonction pour avoir une photo
+const selectedNewPic = addPicInput.files[0];
+
+// Taille requise, 4 Mo
+const sizeFileMax = 4 * 1024 * 1024;
+
+// Type de fichiers requis
+const typeFile = ["image/jpg", "image/png"];
+
+// Vérification de la taille de la photo
+if (selectedNewPic.size > sizeFileMax) {
+  alert("Votre fichier dépasse 4 Mo.");
+  // Vérification du type de fichier
+} else if (!typeFile.includes(selectedNewPic.type)) {
+  alert("Seuls les fichiers de type jpg ou png sont acceptés.");
+} else {
+  // Cacher le contenu de la photo
+  addPicContent.style.display = "none";
+}
+
+// Créer une nouvelle image
+let newPic = document.createElement("img");
+
+// Ajouter la source de la photo en uutilisant l'url créee
+newPic.src = URL.createObjectURL(selectedNewPic);
+newPic.style.height = "169px";
+// Placer l'image dansla <div> previewNewPic
+previewNewPic.appendChild(newPic);
+
+newPic.addEventListener("click", () => {
+  // Changer la photo en cliquant dessus
+  // Appeler la fonction qui réinitialise la photo de la seconde modale
+});
+
+// Fonction pour envoyer la photo à l'API
+function postNewPic() {
+  // Créer l'objet formData pour envoyer le formulaire à la modale
+
+  // Ajouter les valeurs au formData
+  formaData.append("title", inputTitle.value);
+  formaData.append("category", selection.value);
+  FormData.append("image", addPicInput.files[0]);
+
+  // Envoyer à l'API
+  fetch("http://localhost:5678/api/works", {
+    method: "POST",
+    headers: {
+      Autorization: "Bearer " + localStorage.getItem("token"),
+    },
+    body: formData,
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw Error(`${res.status}`);
+      }
+      return res.json();
+    })
+    .then((modaleGallery) => {
+      // Mise à jour de la galerie et fermeture de la modale
+      modaleProjects.push(modaleGallery);
+    })
+    .catch((error) => alert("Error : " + error));
+}
+postNewPic();
