@@ -4,10 +4,16 @@ const gallery = document.querySelector(".gallery");
 const categories = document.querySelector(".categories");
 // console.log(categories);
 
-const log = document.getElementById("log");
-log.addEventListener("click", () => {
-  window.location.href = "login.html";
+const log = document.getElementById("buttonLogin");
+log.addEventListener("click", (e) => {
+  if (e.target.innerText == "logout") {
+    localStorage.removeItem("token");
+    window.location.href = "index.html";
+  } else {
+    window.location.href = "login.html";
+  }
 });
+
 const contacts = document.querySelector("#contacts");
 const projets = document.querySelector("#projets");
 
@@ -33,6 +39,7 @@ async function fetchProjectsData() {
     .then((data) => (projects = data));
   // console.log(projects);
   projectsDisplay();
+  console.log(projects);
 }
 fetchProjectsData();
 
@@ -41,6 +48,7 @@ function projectsDisplay() {
   // pour chaque projet, on crée les éléments suivants
   projects.forEach((project) => {
     // console.log(project);
+    const item = document.createElement("div");
     const figure = document.createElement("figure");
     const picture = document.createElement("img");
     const figcaption = document.createElement("figcaption");
@@ -51,9 +59,12 @@ function projectsDisplay() {
     figcaption.innerText = project.title;
 
     // puis on les ajoute à cet endroit dans le html
-    gallery.append(figure);
+    gallery.append(item);
+    item.append(figure);
     figure.append(picture);
     figure.append(figcaption);
+
+    item.classList.add("project");
   });
 }
 
@@ -66,36 +77,6 @@ categories.innerHTML = `
 <input class="inputCategories" id="3" type="button" name="Hotels & Restaurants" value="Hotels & Restaurants">
 </div>
 `;
-// -----------------------------------------------------
-// // Filtrer les projets en cliquant sur les catégories
-// tentative ultra foireuse
-
-// function filterCategories() {
-//   const inputCategories = document.querySelectorAll(".inputCategories");
-//   inputCategories.forEach((inputCategory) => {
-//     inputCategory.addEventListener("click", (e) => {
-//       console.log(e.target.id);
-//       if (e.target.value === "Tous") {
-//         projectsDisplay();
-//       } else if (e.target.value === "Objets") {
-//         gallery.innerHTML = "";
-//         projects.filter((projects.categoryId = 2));
-//         projectsDisplay();
-//       } else if (e.target.value === "Appartements") {
-//         gallery.innerHTML = "";
-//         projects.filter((projects.categoryId = 3));
-//         projectsDisplay();
-//       } else if (e.target.value === "Hotels & Restaurants") {
-//         gallery.innerHTML = "";
-//         projects.filter((projects.categoryId = 4));
-//         projectsDisplay();
-//       }
-//     });
-//   });
-// }
-
-// filterCategories();
-// --------------------------------------------------------------
 
 // Filtrer les projets en cliquant sur les catégories
 function filterCategories() {

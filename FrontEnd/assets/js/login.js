@@ -1,13 +1,15 @@
-// 4) Création de la page login (avec design)
+//  Variables
 
-// 5) Réaliser la partie connexion sur la page login (sauvegarder le token en localStorage)
-
-// Variables
 let email = document.getElementById("email");
 let password = document.getElementById("password");
 const inputLogin = document.querySelector("#loginForm input");
 const span = document.querySelector("#loginForm span");
 const formLogin = document.querySelector("#loginForm");
+
+const logo = document.querySelector("#logo");
+const contacts = document.querySelector("#contacts");
+const projets = document.querySelector("#projets");
+const token = localStorage.getItem("token");
 
 //  Afficher un message d'erreur si la saisie est mauvaise
 const errorDisplay = (message, valid) => {
@@ -102,4 +104,19 @@ formLogin.addEventListener("submit", (e) => {
   const emailValue = email.value.trim();
   const passwordValue = password.value.trim();
   connexionSubmit(emailValue, passwordValue);
+});
+
+// Actions au clic sur les liens dans la nav
+logo.addEventListener("click", () => {
+  // Click sur le logo = retour sur la page d'accueil
+  window.location.href = "./index.html";
+});
+contacts.addEventListener("click", () => {
+  // Click sur le bouton contact = redirection sur la section contact de la page d'accueil
+  window.location.href = "./index.html#contact";
+});
+projets.addEventListener("click", () => {
+  // Click sur le bouton projets = redirection sur la section "Mes projets" de la page d'accueil
+  window.location.href = "./index.html#portfolio";
+  // console.log("projets");
 });
