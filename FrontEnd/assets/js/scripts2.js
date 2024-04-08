@@ -75,7 +75,13 @@ async function getWorks() {
 /**
  * Suppression de l'affichage sur la page d'accueil + suppression affichage dans la modale
  */
-function removeDisplayWork(id) {}
+function removeDisplayWork(id) {
+  const work = document.querySelector(`.work[id="${id}"]`);
+  work.remove();
+
+  const project = document.querySelector(`.project[id="${id}"]`);
+  project.remove();
+}
 
 /**
  * Suppression d'un projet
@@ -127,6 +133,8 @@ async function createModalWorks() {
     const figure = document.createElement("figure");
     const picture = document.createElement("img");
 
+    item.setAttribute("id", work.id);
+
     // on leur donne les valeurs suivantes
     picture.src = work.imageUrl;
     picture.alt = work.title;
@@ -148,8 +156,9 @@ async function createModalWorks() {
     button.addEventListener("click", () => {
       removeWork(work.id);
     });
-    exitModals();
   });
+
+  exitModals();
 
   // Crée le bouton "ajout d'un projet" et l'ajoute dans la modale
   const btnAddWork = document.createElement("button");
@@ -185,63 +194,47 @@ function submitForm() {
   const category = document.querySelector("#selection").value;
   const image = document.querySelector("#addPicInput").files[0];
 
-  console.log(title, category, image);
+  // TODO - On vérifie qu'on a toutes les données
+  // console.log(title, category, image);
 
   // Ajoute les valeurs au formData
   formData.append("title", title);
-  formData.append("category", category);
+  formData.append("category", parseInt(category));
   formData.append("image", image);
 
   // Envoi de la requête POST à l'API
-  fetch(`http://localhost:5678/api/works`, {
+  return fetch(`http://localhost:5678/api/works`, {
     method: "POST",
     headers: {
       Accept: "application/json",
-      "Content-Type": "multipart/form-data",
       Authorization: "Bearer " + localStorage.getItem("token"),
     },
     body: formData,
   })
     .then((res) => {
-      if (!res.ok) {
+      if (res.status !== 201) {
         throw Error(`${res.status}`);
       }
       return res.json();
     })
-    .then((newWork) => {
-      // Met à jour la modalWorks avec les nouvelles données
-      const modalGallery = document.querySelector("#modalGallery");
-      const item = document.createElement("div");
-      const figure = document.createElement("figure");
-      const picture = document.createElement("img");
-
-      picture.src = newWork.imageUrl;
-      picture.alt = newWork.title;
-
-      item.append(figure);
-      figure.append(picture);
-
-      item.classList.add("work");
-      modalGallery.append(item);
-
-      const button = document.createElement("button");
-      button.classList.add("btnWorkRemove");
-      button.innerHTML = `<i class="fa-solid fa-trash-can trash"></i>`;
-      item.append(button);
-
-      button.addEventListener("click", () => {
-        removeWork(newWork.id);
-      });
-      exitModals();
+    .then(() => {
+      removeModalForm();
+      createModalWorks();
     })
-    .catch((error) => alert(error));
+    .catch((error) => {
+      console.error(
+        "Une erreur est survenue lors de l'envoi du formulaire.",
+        error
+      );
+    });
 }
 
 /**
  * Créer la modal du formulaire et l'afficher sur la page
  */
-function createModalForm() {
+async function createModalForm() {
   const modal = document.createElement("div");
+
   modal.classList.add("modal");
   modal.setAttribute("id", "modalForm");
   modal.innerHTML = ``;
@@ -255,6 +248,7 @@ function createModalForm() {
   const addPicContent = document.createElement("div");
   const addInputContainer = document.createElement("div");
 
+  // Contenu et style de base de la modale du formulaire
   modalContent.classList.add("modal-content");
   modalContent.innerHTML = `
       <span id="spanBack"><i class="fa-solid fa-arrow-left arrow"></i></span>
@@ -266,22 +260,30 @@ function createModalForm() {
 
   modal.append(modalContent); // Ajout de l'intérieur de la modale dans la modale
 
+  // Pointe la div qui englobe les 3 élements nécessaires à la création d'un projet
   const formContainer = document.querySelector(".form-container");
+
+  // Ajout dans le DOM de la div du conteneur de la partie photo
   formContainer.append(addPicContainer);
   addPicContainer.classList.add("add-pic-container");
 
+  // Ajout dans le DOM de la div où s'affichera la photo sélectionnée
   addPicContainer.append(previewNewPic);
   previewNewPic.classList.add("preview-new-pic");
 
+  //  Ajout dans le DOM de la div qui contient le content relatif à la selection de la nouvelle photo
   addPicContainer.append(addPicContent);
   addPicContent.classList.add("add-pic-content");
   addPicContent.innerHTML = `
-  <span id="iconPic" class="icon-pic"><i class="fa-regular fa-image"></i></span>
+  <span id="iconPic" class="icon-pic">
+    <i class="fa-regular fa-image"></i>
+    </span>
   <input type="file" name="addPicInput" class="add-pic-input" id="addPicInput">
   <label id="addPicLabel" class="add-pic-label" for="addPicInput">+ Ajouter photo</label>
   <p id="addPicTxt">jpg, png : 4mo max</p>
   `;
 
+  // Ajout dans le DOM de la nouvelle image et de ses attributs
   previewNewPic.append(selectedNewPic);
   selectedNewPic.setAttribute("src", "#");
   selectedNewPic.setAttribute("alt", "image choisie");
@@ -289,24 +291,50 @@ function createModalForm() {
   selectedNewPic.classList.add("image-display");
   selectedNewPic.style.display = "none";
 
+  // Ajout dans le DOM de la div qui englobe l'imput du titre et le select de la catégorie pour la nouvelle photo
   formContainer.append(addInputContainer);
   addInputContainer.classList.add("add-input-container");
+
+  // Ajout de l'input texte du titre du select des catégories
   addInputContainer.innerHTML = `
   <label for="inputTitle">Titre</label>
   <input type="text" name="title" id="inputTitle">
-  <label for="add-input-category">Catégorie</label>
-  <select id="selection" class="selection">
-      <option value="Objets">Objets</option>
-      <option value="Appartements">Appartements</option>
-      <option value="Hotels & Restaurants">Hotels & Restaurants</option>
-  </select>
-  `;
+  <label for="selection">Catégorie</label>
+  <select id="selection" class="selection"></select>`;
+
+  // Ajout des options du select des catégories
+  let selectCategories = [];
+  await getSelectCategories();
+  selectCategories.forEach((selectCategory) => {
+    const selectOptions = document.createElement("option");
+    selectOptions.value = selectCategory.id;
+    selectOptions.innerText = `${selectCategory.name}`;
+    selection.append(selectOptions);
+    // console.log(selectOptions.value, selectOptions.innerText);
+  });
+  // <option value="1">Objets</option>
+  // <option value="2">Appartements</option>
+  // <option value="3">Hotels & Restaurants</option>
 
   /**
    * Dès que l'utilisateur sélectionne une image, l'afficher et mettre à jour le contenu
    */
   const addPicInput = document.querySelector(".add-pic-input");
   const addInputContent = document.querySelector(".add-pic-content");
+
+  // Recupérer les catégories
+  async function getSelectCategories() {
+    await fetch("http://localhost:5678/api/categories", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "content-type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => (selectCategories = data));
+    // console.log(selectCategories);
+  }
 
   addPicInput.addEventListener("change", (event) => {
     const file = event.target.files[0];
@@ -333,14 +361,9 @@ function createModalForm() {
 
   modalContent.append(btnPostWork);
 
-  // Event : Envoi du formulaire (submitForm)
-  btnPostWork.addEventListener("click", () => {
-    submitForm();
-    console.log("formulaire envoyé");
-    // Event : Passage à la première modale (removeModalForm + createModalWorks)
-    removeModalForm();
-    createModalWorks();
-  });
+  // Event : Envoi du formulaire
+  btnPostWork.addEventListener("click", submitForm);
+
   exitModals();
   backModalWorks();
 }

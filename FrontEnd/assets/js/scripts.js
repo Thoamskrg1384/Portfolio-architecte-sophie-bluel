@@ -1,12 +1,14 @@
 let projects = [];
+let btnCategories = [];
 const gallery = document.querySelector(".gallery");
-// console.log(gallery);
 const categories = document.querySelector(".categories");
-// console.log(categories);
+const contacts = document.querySelector("#contacts");
+const projets = document.querySelector("#projets");
+const log = document.querySelector("#buttonLogin");
 
-const log = document.getElementById("buttonLogin");
-log.addEventListener("click", (e) => {
-  if (e.target.innerText == "logout") {
+// Redirige vers la page d'accueil administrateur ou sur la page de login et gère la suppression du token à la déconnexion.
+log.addEventListener("click", () => {
+  if (log.innerText == "logout") {
     localStorage.removeItem("token");
     window.location.href = "index.html";
   } else {
@@ -14,20 +16,17 @@ log.addEventListener("click", (e) => {
   }
 });
 
-const contacts = document.querySelector("#contacts");
-const projets = document.querySelector("#projets");
-
-// Actions au clic sur les liens dans la nav
+// Redirection au clic sur les liens dans la nav
 contacts.addEventListener("click", () => {
-  window.location.href = "#contact";
+  window.location.href = "#contact"; // Redirection vers la section Contact
 });
 projets.addEventListener("click", () => {
-  window.location.href = "#portfolio";
+  window.location.href = "#portfolio"; // Redirection vers la section Mes projets
   // console.log("projets");
 });
 
 // Récupération des projets sur l'api
-async function fetchProjectsData() {
+async function getProjects() {
   await fetch("http://localhost:5678/api/works", {
     method: "GET",
     headers: {
@@ -39,9 +38,8 @@ async function fetchProjectsData() {
     .then((data) => (projects = data));
   // console.log(projects);
   projectsDisplay();
-  console.log(projects);
 }
-fetchProjectsData();
+getProjects();
 
 // Affichage des projets
 function projectsDisplay() {
@@ -65,31 +63,81 @@ function projectsDisplay() {
     figure.append(figcaption);
 
     item.classList.add("project");
+    item.setAttribute("id", project.id);
   });
 }
 
-// Affichage des catégories dans le html
-categories.innerHTML = `
-<div class="filtersContainer">
-<input class="inputCategories inputSelected" id="0" type="button" name="Tous" value="Tous">
-<input class="inputCategories" id="1" type="button" name="Objets" value="Objets">
-<input class="inputCategories" id="2" type="button" name="Appartements" value="Appartements">
-<input class="inputCategories" id="3" type="button" name="Hotels & Restaurants" value="Hotels & Restaurants">
-</div>
-`;
+// // Affichage des catégories dans le html
+// categories.innerHTML = `
+// <div class="filters-container">
+// <input class="input-categories input-selected" id="0" type="button" name="Tous" value="Tous">
+// <input class="input-categories" id="1" type="button" name="Objets" value="Objets">
+// <input class="input-categories" id="2" type="button" name="Appartements" value="Appartements">
+// <input class="input-categories" id="3" type="button" name="Hotels & Restaurants" value="Hotels & Restaurants">
+// </div>
+// `;
+
+// Recupérer les catégories
+async function getCategories() {
+  await fetch("http://localhost:5678/api/categories", {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "content-type": "application/json",
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => (btnCategories = data));
+  // console.log(btnCategories);
+  btnCategoriesDisplay();
+}
+getCategories();
+
+// Affichage des boutons de catégories
+function btnCategoriesDisplay() {
+  // Crée un container
+  const filtersContainer = document.createElement("div");
+  categories.append(filtersContainer);
+  filtersContainer.classList.add("filters-container");
+
+  // Crée le bouton de filtre "Tous"
+  const input = document.createElement("input");
+  filtersContainer.append(input);
+  input.classList.add("input-categories");
+  input.classList.add("input-selected");
+  input.setAttribute("id", 0);
+  input.setAttribute("type", "button");
+  input.setAttribute("value", "Tous");
+
+  // pour chaque catégorie, on crée les éléments suivants
+  btnCategories.forEach((btnCategory) => {
+    const inputCategories = document.createElement("input");
+    inputCategories.classList.add("input-categories");
+
+    // on leur donne les valeurs suivantes
+    inputCategories.id = btnCategory.id;
+    inputCategories.name = btnCategory.name;
+    inputCategories.value = btnCategory.name;
+
+    // puis on les ajoute à cet endroit dans le html
+    filtersContainer.append(inputCategories);
+    inputCategories.setAttribute("type", "button");
+  });
+  filterCategories();
+}
 
 // Filtrer les projets en cliquant sur les catégories
 function filterCategories() {
-  const inputCategories = document.querySelectorAll(".inputCategories");
+  const inputCategories = document.querySelectorAll(".input-categories");
   inputCategories.forEach((inputCategory) => {
     inputCategory.addEventListener("click", (e) => {
       // console.log(e.target.id);
 
       // changer la couleur du bouton du filtre séléctionné
       inputCategories.forEach((category) => {
-        category.classList.remove("inputSelected");
+        category.classList.remove("input-selected");
       });
-      e.target.classList.add("inputSelected");
+      e.target.classList.add("input-selected");
 
       // Affichage de la catégorie selectionnée
       if (e.target.value === "Tous") {
@@ -117,5 +165,4 @@ function filterCategories() {
     });
   });
 }
-
 filterCategories();
