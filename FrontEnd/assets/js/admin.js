@@ -14,7 +14,7 @@ function isUserConnected() {
 }
 
 /**
- * Modifie l'affichage dans la navigation du bouton login
+ * Modifie l'affichage dans la navigation du bouton login qui devient "logout"
  */
 function toggleButtonLogout() {
   const buttonLogin = document.querySelector("#buttonLogin");
@@ -50,7 +50,7 @@ function createAdminButtons() {
 }
 
 /**
- * Récupère les projets
+ * Récupère les projets pour la modale sur l'API avec le fetch méthode GET
  */
 async function getWorks() {
   let works = [];
@@ -68,7 +68,6 @@ async function getWorks() {
       works = data;
     });
   // console.log(works);
-
   return works;
 }
 
@@ -171,7 +170,7 @@ async function createModalWorks() {
   btnAddWork.addEventListener("click", () => {
     removeModalWorks();
     createModalForm();
-    console.log("test acces formulaire ajout photo");
+    // console.log("test acces formulaire ajout photo");
   });
 }
 
@@ -186,7 +185,7 @@ function removeModalWorks() {
 /**
  * Envoi des données à l'API pour la création d'un projet
  */
-function submitForm() {
+async function submitForm() {
   const formData = new FormData();
 
   // Récupère les valeurs du formulaire
@@ -203,7 +202,7 @@ function submitForm() {
   formData.append("image", image);
 
   // Envoi de la requête POST à l'API
-  return fetch(`http://localhost:5678/api/works`, {
+  fetch(`http://localhost:5678/api/works`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -218,8 +217,9 @@ function submitForm() {
       return res.json();
     })
     .then(() => {
-      removeModalForm();
+      getProjects();
       createModalWorks();
+      removeModalForm();
     })
     .catch((error) => {
       console.error(
@@ -312,9 +312,6 @@ async function createModalForm() {
     selection.append(selectOptions);
     // console.log(selectOptions.value, selectOptions.innerText);
   });
-  // <option value="1">Objets</option>
-  // <option value="2">Appartements</option>
-  // <option value="3">Hotels & Restaurants</option>
 
   /**
    * Dès que l'utilisateur sélectionne une image, l'afficher et mettre à jour le contenu
@@ -336,8 +333,8 @@ async function createModalForm() {
     // console.log(selectCategories);
   }
 
-  addPicInput.addEventListener("change", (event) => {
-    const file = event.target.files[0];
+  addPicInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
     const reader = new FileReader();
 
     reader.onload = function () {

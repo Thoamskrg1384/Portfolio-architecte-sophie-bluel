@@ -11,60 +11,70 @@ const contacts = document.querySelector("#contacts");
 const projets = document.querySelector("#projets");
 const token = localStorage.getItem("token");
 
-//  Afficher un message d'erreur si la saisie est mauvaise
-const errorDisplay = (message, valid) => {
+/**
+ * Fonction qui permet d'afficher un message d'erreur si la saisie est mauvaise
+ */
+function errorDisplay(message, valid) {
   if (!valid) {
+    // Si la saisie n'est pas valide alors on ajoute des classes css et un message d'alerte pour notofier l'erreur
     inputLogin.classList.remove("inputBorderNone");
     inputLogin.classList.add("error");
     password.classList.add("error");
     span.textContent = message;
     span.classList.add("error_span");
   } else {
+    // Sinon on enlève les classes css d'erreur et on efface le message d'alerte
     inputLogin.classList.add("inputBorderNone");
     inputLogin.classList.remove("error");
     password.classList.remove("error");
     span.textContent = "";
     span.classList.remove("error_span");
   }
-};
+}
 
 /**
- * Verifier que le format de l'adresse mail est correct
+ * Fonction qui permet de vérifier que le format de l'adresse mail est correct
  */
-const emailChecker = (value) => {
+function emailChecker(value) {
   if (!value.match(/^[\w_.-]+@[\w-]+\.[a-z]{2,4}$/i)) {
+    // Si le contenu ne respecte pas la condition de la regex, qu'il n'est pas au bon format, alors appelle la fonction "errorDisplay" avec un message d'erreur et retourne "false"
     errorDisplay("Erreur dans l’identifiant", false);
     return false;
   } else {
-    errorDisplay("", true);
+    errorDisplay("", true); // Sinon appelle la fonction "errorDisplay" sans message d'erreur et retourne "true"
     return true;
   }
-};
+}
 email.addEventListener("input", (e) => {
-  const value = e.target.value;
+  const value = e.target.value; // On récupère les données de l'input et on les donnes en paramètre à emailChecker
   emailChecker(value);
   // console.log(e.target.value);
 });
 
-// Verifier que le mdp est valide
-const passwordChecker = (value) => {
-  if (!value.match("S0phie")) {
+/**
+ * Fonction qui permet de vérifier que le mdp est valide
+ */
+function passwordChecker(value) {
+  if (!value.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,12}$/)) {
+    // Si le mdp n'est pas égal à "S0phie", alors appelle la fonction "errorDisplay" avec un message d'erreur et retourne "false"
     errorDisplay("Erreur dans le mot de passe", false);
     return false;
   } else {
+    // Sinon appelle la fonction "errorDisplay" sans message d'erreur et retourne "true"
     errorDisplay("", true);
     return true;
   }
-};
+}
 password.addEventListener("input", (e) => {
-  const value = e.target.value;
+  const value = e.target.value; // On récupère les données de l'input et on les donnes en paramètre à passwordChecker
   passwordChecker(value);
   // console.log(e.target.value);
 });
 
-// Rediriger vers la page d'acceuil, au click sur le bouton "se connecter", si le token est bon
-
-const connexionSubmit = (emailValue, passwordValue) => {
+/**
+ * Envoi de l'identifiant et du mdp à l'API avec le fetch méthode POST et récupération du token
+ */
+function connexionSubmit(emailValue, passwordValue) {
   const dataToSend = {
     email: "sophie.bluel@test.tld",
     password: "S0phie",
@@ -77,18 +87,20 @@ const connexionSubmit = (emailValue, passwordValue) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        // Conversion au format JSON
         email: emailValue,
         password: passwordValue,
       }),
     })
       .then((response) => {
-        // Il y a eun problème, on stop les then avec une erreur qui va dans le catch
+        // Il y a eun problème, on stop les then avec une erreur qui va dans le catch et log une erreur
         if (response.status !== 200) {
           throw new Error("Une erreur est survenue");
         }
         return response.json();
       })
       .then((data) => {
+        // Sinon récuperère le token et l'enregistre dans le localStorage puis redirige vers la page d'accueil administrateur.
         localStorage.setItem("token", data.token);
         window.location.href = "index.html";
       })
@@ -96,7 +108,7 @@ const connexionSubmit = (emailValue, passwordValue) => {
         errorDisplay("Une erreur est survenue", false);
       });
   }
-};
+}
 
 formLogin.addEventListener("submit", (e) => {
   e.preventDefault();
