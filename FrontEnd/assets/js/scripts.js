@@ -46,7 +46,6 @@ async function getProjects() {
     .then((res) => res.json())
     .then((data) => (projects = data));
   // console.log(projects);
-  gallery.innerHTML = "";
   projectsDisplay(); // Appel de la fonction qui passe en revue tous les projets récupérés dans l'API et les créés dans le DOM
 }
 getProjects(); // Appel de la fonction qui récupère les projets sur l'API

@@ -217,9 +217,9 @@ async function submitForm() {
       return res.json();
     })
     .then(() => {
-      getProjects();
-      createModalWorks();
-      removeModalForm();
+      getProjects(); // recupère et affiche les projets
+      createModalWorks(); // ouvre la modale des projets
+      removeModalForm(); // ferme la modale du formulaire
     })
     .catch((error) => {
       console.error(
