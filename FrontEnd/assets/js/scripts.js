@@ -54,27 +54,11 @@ getProjects(); // Appel de la fonction qui récupère les projets sur l'API
  * Parcours des projets reçus depuis l'API et création dans le DOM
  */
 function projectsDisplay() {
+  gallery.innerHTML = "";
   // pour chaque projet, on crée les éléments suivants
   projects.forEach((project) => {
     // console.log(project);
-    const item = document.createElement("div");
-    const figure = document.createElement("figure");
-    const picture = document.createElement("img");
-    const figcaption = document.createElement("figcaption");
-
-    // on leur donne les valeurs suivantes
-    picture.src = project.imageUrl;
-    picture.alt = project.title;
-    figcaption.innerText = project.title;
-
-    // puis on les ajoute à cet endroit dans le DOM
-    gallery.append(item);
-    item.append(figure);
-    figure.append(picture);
-    figure.append(figcaption);
-
-    item.classList.add("project");
-    item.setAttribute("id", project.id);
+    updateProjectWork(project); // fonction qui permet de créer un projet dans le DOM
   });
 }
 

@@ -648,3 +648,9 @@ select {
   color: #3d3d3d;
   font-size: 14px;
 }
+
+.error-message {
+  color: red;
+  font-weight: 700;
+  margin: 2em;
+}

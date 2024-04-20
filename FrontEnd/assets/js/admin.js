@@ -193,7 +193,12 @@ async function submitForm() {
   const category = document.querySelector("#selection").value;
   const image = document.querySelector("#addPicInput").files[0];
 
-  // TODO - On vérifie qu'on a toutes les données
+  // Efface le message d'erreur dans l'ajout de projet en cas de saisie dans l'inputTitle
+  inputTitle = document.addEventListener("change", (e) => {
+    clearError();
+  });
+
+  // On vérifie qu'on a toutes les données
   // console.log(title, category, image);
 
   // Ajoute les valeurs au formData
@@ -216,8 +221,8 @@ async function submitForm() {
       }
       return res.json();
     })
-    .then(() => {
-      getProjects(); // recupère et affiche les projets
+    .then((data) => {
+      updateProjectWork(data); // ajoute le nouveau projet dans le DOM
       createModalWorks(); // ouvre la modale des projets
       removeModalForm(); // ferme la modale du formulaire
     })
@@ -226,7 +231,69 @@ async function submitForm() {
         "Une erreur est survenue lors de l'envoi du formulaire.",
         error
       );
+      // Vérifie que tous les champs sont remplis
+      if (!image || !title) {
+        errorSubmit(); // Affiche un message d'erreur si les champs ne sont pas remplis
+        return; // Arrête l'exécution de la fonction
+      }
     });
+}
+//-------------------------------------------------------------------------------
+/**
+ * Affiche une span avec un message d'erreur si tous les champs ne sont pas remplis
+ */
+function errorSubmit() {
+  const modalContent = document.querySelector(".modal-content");
+  const btnPostWork = document.querySelector(".btn-post-work");
+
+  // Création de la span d'erreur si elle n'existe pas déjà
+  let spanErrorSubmit = document.querySelector("#spanErrorSubmit");
+  if (!spanErrorSubmit) {
+    spanErrorSubmit = document.createElement("span");
+    spanErrorSubmit.id = "spanErrorSubmit";
+    spanErrorSubmit.classList.add("error-message");
+    spanErrorSubmit.innerText = "Veuillez remplir tous les champs";
+    modalContent.append(spanErrorSubmit); // Insère la span avant le bouton
+  }
+
+  // Cache le bouton de validation
+  btnPostWork.style.display = "none";
+}
+
+// Fonction pour effacer le message d'erreur et réafficher le bouton de validation
+function clearError() {
+  const spanErrorSubmit = document.querySelector("#spanErrorSubmit");
+  const btnPostWork = document.querySelector(".btn-post-work");
+
+  if (spanErrorSubmit) {
+    spanErrorSubmit.remove(); // Supprime la span d'erreur
+    btnPostWork.style.display = "block"; // Réaffiche le bouton de validation
+  }
+}
+// ----------------------------------------------------------------------------
+/**
+ *  Ajoute un nouveau projet dans le DOM
+ */
+
+function updateProjectWork(data) {
+  const item = document.createElement("div");
+  const figure = document.createElement("figure");
+  const picture = document.createElement("img");
+  const figcaption = document.createElement("figcaption");
+
+  // on leur donne les valeurs suivantes
+  picture.src = data.imageUrl;
+  picture.alt = data.title;
+  figcaption.innerText = data.title;
+
+  // puis on les ajoute à cet endroit dans le DOM
+  gallery.append(item);
+  item.append(figure);
+  figure.append(picture);
+  figure.append(figcaption);
+
+  item.classList.add("project");
+  item.setAttribute("id", data.id);
 }
 
 /**
